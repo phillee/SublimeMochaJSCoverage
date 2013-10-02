@@ -1,7 +1,11 @@
 SublimeJSCoverage
 =================
 
-Displays inline coverage report: Super + Shift + C
+Highlights uncovered lines in the current file based on a previous coverage run.
+
+Display highlights: Super + Shift + C
+
+Remove highlights: Super + Shift + C + X
 
 Plugin tries to find the latest coverage report in a closest "coverage" directory.
 

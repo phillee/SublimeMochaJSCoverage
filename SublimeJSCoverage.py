@@ -7,7 +7,7 @@ import json
 debug = lambda *args: sys.stdout.write("\n%s" % " ".join(map(str, args)))
 
 COVERAGE_DIR_NAME = 'coverage'
-
+REGION_KEY = 'SublimeJSCoverage'
 
 def find_project_root(file_path):
     """
@@ -118,5 +118,16 @@ class ShowJsCoverageCommand(sublime_plugin.TextCommand):
 
         # update highlighted regions
         if outlines:
-            view.add_regions('SublimeJSCoverage', outlines,
+            view.add_regions(REGION_KEY, outlines,
                              'markup.deleted.diff', 'bookmark', sublime.DRAW_OUTLINED)
+
+
+class ClearJsCoverageCommand(sublime_plugin.TextCommand):
+
+    """
+        Remove highlights created by plugin.
+    """
+
+    def run(self, edit):
+        view = self.view
+        view.erase_regions(REGION_KEY)
