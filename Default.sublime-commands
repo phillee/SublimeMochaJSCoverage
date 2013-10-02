@@ -1,0 +1,6 @@
+[
+  {
+    "caption": "JSCoverage: Show JS Coverage",
+    "command": "show_js_coverage"
+  }
+]
