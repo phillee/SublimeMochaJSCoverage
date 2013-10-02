@@ -4,7 +4,7 @@ import sublime
 import sublime_plugin
 import json
 
-debug = lambda *args: sys.stdout.write("\n%s" % " ".join(args))
+debug = lambda *args: sys.stdout.write("\n%s" % " ".join(map(str, args)))
 
 COVERAGE_DIR_NAME = 'coverage'
 
@@ -26,8 +26,8 @@ def find_coverage_filename(coverage_dir):
         Returns latest coverage json for specifed file or None if cannot find it
         in specifed coverage direcotry
     """
-    files = os.listdir(coverage_dir)
-    debug(",".join(files))
+    files = [f for f in os.listdir(coverage_dir) if f.endswith('.json')]
+    debug("discovered files: " + ",".join(files or []))
     getmtime = lambda key: os.path.getmtime(os.path.join(coverage_dir, key))
     coverage_file_name = None
     if files:
@@ -51,6 +51,7 @@ class ShowJsCoverageCommand(sublime_plugin.TextCommand):
         Highlight uncovered lines in the current file
         based on a previous coverage run.
     """
+
     def run(self, edit):
         view = self.view
         # get name of currently opened file
@@ -71,12 +72,13 @@ class ShowJsCoverageCommand(sublime_plugin.TextCommand):
         debug("Display js coverage report for file", filename)
         debug("project_root", project_root)
         debug("relative_filename", relative_filename)
+        debug("coverage_dir", coverage_dir)
         debug("coverage_filename", coverage_filename)
 
         if not coverage_filename:
             if view.window():
-                sublime.status_message(
-                    "Can't find the coverage file in project root" + str(project_root))
+                return sublime.status_message(
+                    "Can't find the coverage file in project root: " + str(project_root))
             return
 
         # Clean up
@@ -87,13 +89,18 @@ class ShowJsCoverageCommand(sublime_plugin.TextCommand):
 
         report = read_coverage_report(
             os.path.join(coverage_dir, coverage_filename))
+        if report is None:
+            if view.window():
+                sublime.status_message(
+                    "Can't read coverage report from file: " + str(coverage_filename))
+            return
         debug("Found report for the following number of files: " + str(len(report)))
 
         if not report:
             view.set_status("SublimeJSCoverage", "UNCOVERED!")
             if view.window():
                 sublime.status_message(
-                    "Can't find the coverage json file in project root" + project_root)
+                    "Can't find the coverage json file in project root: " + project_root)
 
         for tested_file_name in report:
             tested_file_name2 = tested_file_name.replace("./", "")
