@@ -1,13 +1,15 @@
 import os
 import sys
+import json
+
 import sublime
 import sublime_plugin
-import json
 
 debug = lambda *args: sys.stdout.write("\n%s" % " ".join(map(str, args)))
 
 COVERAGE_DIR_NAME = 'coverage'
 REGION_KEY = 'SublimeJSCoverage'
+
 
 def find_project_root(file_path):
     """
@@ -38,11 +40,12 @@ def find_coverage_filename(coverage_dir):
 
 
 def read_coverage_report(file_path):
-    try:
-        coverage_json = json.load(open(file_path, 'r'))
-        return coverage_json
-    except IOError:
-        return None
+    with open(file_path, 'r') as coverage_file:
+        try:
+            coverage_json = json.load(coverage_file)
+            return coverage_json
+        except IOError:
+            return None
 
 
 class ShowJsCoverageCommand(sublime_plugin.TextCommand):
