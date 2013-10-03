@@ -9,6 +9,14 @@ Remove highlights: Super + Shift + C + X
 
 Plugin tries to find the latest coverage report in a closest "coverage" directory.
 
+
+Karma configuration
+===================
+
+You may need to install coverage plugin
+```
+npm install karma-coverage --save-dev
+
 Karama should be configured to put coverage report to coverage directory, e.g:
 
 ```javascript
