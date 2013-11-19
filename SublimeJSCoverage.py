@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import fnmatch
 
 import sublime
 import sublime_plugin
@@ -28,7 +29,10 @@ def find_coverage_filename(coverage_dir):
         Returns latest coverage json for specifed file or None if cannot find it
         in specifed coverage direcotry
     """
-    files = [f for f in os.listdir(coverage_dir) if f.endswith('.json')]
+    files = []
+    for root, dirnames, filenames in os.walk(coverage_dir):
+    	for filename in fnmatch.filter(filenames, '*.json'):
+      		files.append(os.path.join(root, filename))
     debug("discovered files: " + ",".join(files or []))
     getmtime = lambda key: os.path.getmtime(os.path.join(coverage_dir, key))
     coverage_file_name = None
