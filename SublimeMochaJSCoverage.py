@@ -64,7 +64,7 @@ def renderCoverage(self, view):
   coverage_files = {}
 
   for f in report.get("files"):
-    coverage_files["app/" + f.get("filename")] = f
+    coverage_files[f.get("filename")] = f
 
   coverage_file = coverage_files.get(relative_filename)
   
