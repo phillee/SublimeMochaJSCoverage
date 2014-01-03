@@ -9,7 +9,7 @@ import sublime_plugin
 debug = lambda *args: sys.stdout.write("\n%s" % " ".join(map(str, args)))
 
 COVERAGE_DIR_NAME = 'coverage'
-REGION_KEY = 'SublimeJSCoverage'
+REGION_KEY = 'SublimeMochaJSCoverage'
 
 
 def find_project_root(file_path):
@@ -89,8 +89,8 @@ class ShowJsCoverageCommand(sublime_plugin.TextCommand):
             return
 
         # Clean up
-        view.erase_status("SublimeJSCoverage")
-        view.erase_regions("SublimeJSCoverage")
+        view.erase_status("SublimeMochaJSCoverage")
+        view.erase_regions("SublimeMochaJSCoverage")
 
         outlines = []
 
@@ -104,7 +104,7 @@ class ShowJsCoverageCommand(sublime_plugin.TextCommand):
         debug("Found report for the following number of files: " + str(len(report)))
 
         if not report:
-            view.set_status("SublimeJSCoverage", "UNCOVERED!")
+            view.set_status("SublimeMochaJSCoverage", "UNCOVERED!")
             if view.window():
                 sublime.status_message(
                     "Can't find the coverage json file in project root: " + project_root)
@@ -129,7 +129,7 @@ class ShowJsCoverageCommand(sublime_plugin.TextCommand):
                              'markup.deleted.diff', 'bookmark', sublime.DRAW_OUTLINED)
 
 
-class ClearJsCoverageCommand(sublime_plugin.TextCommand):
+class ClearMochaJsCoverageCommand(sublime_plugin.TextCommand):
 
     """
         Remove highlights created by plugin.

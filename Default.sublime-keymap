@@ -1,4 +1,4 @@
 [
-	{ "keys": ["super+shift+c"], "command": "show_js_coverage"},
-	{ "keys": ["super+shift+c+x"], "command": "clear_js_coverage"}
+	{ "keys": ["super+shift+c"], "command": "show_mocha_js_coverage"},
+	{ "keys": ["super+shift+c+x"], "command": "clear_mocha_js_coverage"}
 ]

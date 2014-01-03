@@ -1,6 +1,6 @@
 [
   {
-    "caption": "JSCoverage: Show JS Coverage",
-    "command": "show_js_coverage"
+    "caption": "MochaJSCoverage: Show JS Coverage",
+    "command": "show_mocha_js_coverage"
   }
 ]
