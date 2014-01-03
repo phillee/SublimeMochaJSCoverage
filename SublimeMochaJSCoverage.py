@@ -58,8 +58,7 @@ def renderCoverage(self, view):
   if not report:
     view.set_status("SublimeMochaJSCoverage", "UNCOVERED!")
     if view.window():
-      sublime.status_message(
-        "Can't find the coverage json file in project root: " + project_root)
+      sublime.status_message("Can't find " + COVERAGE_FILENAME + " at " + coverage_path)
 
   coverage_files = {}
 
@@ -81,7 +80,7 @@ def renderCoverage(self, view):
         outlines.append(region)
   else:
     if view.window():
-      sublime.status_message("Cannot find coverage data in " + COVERAGE_FILENAME)
+      sublime.status_message("No coverage data for " + relative_filename + " in " + COVERAGE_FILENAME)
 
   # update highlighted regions
   if outlines:
