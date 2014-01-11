@@ -8,17 +8,17 @@ import sublime_plugin
 
 debug = lambda *args: sys.stdout.write("\n%s" % " ".join(map(str, args)))
 
-COVERAGE_FILENAME = 'coverage.json'
+COVERAGE_PATH = 'coverage/coverage.json'
 REGION_KEY = 'SublimeMochaJSCoverage'
 
 class DetectSublimeFileChange(sublime_plugin.EventListener):
   def on_load_async(self, view):
     renderCoverage(self, view)
 
-def read_coverage_report(file_path):
-  with open(file_path, 'r') as coverage_file:
+def readCoverageReport(file_path):
+  with open(file_path, 'r') as coverageFile:
     try:
-      coverage_json = json.load(coverage_file)
+      coverage_json = json.load(coverageFile)
       return coverage_json
     except IOError:
       return None
@@ -32,59 +32,57 @@ def renderCoverage(self, view):
 
   project_root = view.window().project_data().get("folders")[0].get("path");
 
-  relative_filename = filename.replace(project_root + "/", "")
-  coverage_path = os.path.join(project_root, COVERAGE_FILENAME)
+  coveragePath = os.path.join(project_root, COVERAGE_PATH)
 
   debug("Display js coverage report for file", filename)
-  debug("project_root", project_root)
-  debug("relative_filename", relative_filename)
-  debug("coverage_filename", coverage_path)
+  debug("coverage_filename", coveragePath)
 
   # Clean up
-  view.erase_status("SublimeMochaJSCoverage")
-  view.erase_regions("SublimeMochaJSCoverage")
+  view.erase_status(REGION_KEY)
+  view.erase_regions(REGION_KEY)
 
   outlines = []
 
-  report = read_coverage_report(coverage_path)
+  reports = readCoverageReport(coveragePath)
 
-  if report is None:
+  if reports is None:
     if view.window():
       sublime.status_message(
-        "Can't read coverage report from file: " + str(coverage_path))
+        "Can't read coverage report from file: " + str(coveragePath))
 
     return
 
-  if not report:
+  if not reports:
     view.set_status("SublimeMochaJSCoverage", "UNCOVERED!")
     if view.window():
-      sublime.status_message("Can't find " + COVERAGE_FILENAME + " at " + coverage_path)
+      sublime.status_message("Can't find " + COVERAGE_FILENAME + " at " + coveragePath)
 
-  coverage_files = {}
-
-  for f in report.get("files"):
-    coverage_files[f.get("filename")] = f
-
-  coverage_file = coverage_files.get(relative_filename)
+  report = reports.get(filename)
   
-  if coverage_file:
+  if report:
     if view.window():
-      sublime.status_message("Found coverage data in " + COVERAGE_FILENAME)
+      sublime.status_message("Found coverage data")
 
-    debug("Found test report for file " + str(relative_filename))
-    lines = coverage_file.get("source")
-    for num in lines:
-      coverage = lines.get(num).get("coverage")
+    debug("Found report for " + str(filename))
+    for statement, coverage in report["s"].items():
       if coverage == 0:
-        region = view.full_line(view.text_point(int(num), 0))
+        statementCoverage = report["statementMap"][statement]
+        start = statementCoverage["start"]
+        end = statementCoverage["end"]
+
+        # debug("statement" + statement + ", start: " + str(start) + ", end: " + str(end))
+        startOffset = view.text_point(start["line"] - 1, start["column"])
+        endOffset = view.text_point(end["line"] - 1, end["column"])
+
+        region = sublime.Region(startOffset, endOffset)
         outlines.append(region)
   else:
     if view.window():
-      sublime.status_message("No coverage data for " + relative_filename + " in " + COVERAGE_FILENAME)
+      sublime.status_message("No coverage data")
 
   # update highlighted regions
   if outlines:
-    view.add_regions(REGION_KEY, outlines, 'invalid.illegal', 'circle')
+    view.add_regions(REGION_KEY, outlines, 'invalid.illegal', 'bookmark')
 
 class ShowMochaJsCoverageCommand(sublime_plugin.TextCommand):
 
